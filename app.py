@@ -4,7 +4,7 @@ from openai import OpenAI
 from docx import Document
 from io import BytesIO
 
-client = OpenAI()
+client = OpenAI(api_key=st.secrets["openai_api_key"])
 
 st.title("🎓 Asistente Pedagógico IA")
 st.subheader("Sesiones y Rúbricas personalizadas con inteligencia artificial")

@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 import streamlit as st
-import openai
+from openai import OpenAI
 from docx import Document
 from io import BytesIO
 
-# Seguridad: usar clave desde secrets de Streamlit Cloud
-openai.api_key = st.secrets["openai_api_key"]
+client = OpenAI()
 
 st.title("🎓 Asistente Pedagógico IA")
 st.subheader("Sesiones y Rúbricas personalizadas con inteligencia artificial")
@@ -40,14 +39,14 @@ Eres un especialista en educación secundaria en Perú. Genera una sesión de ap
 Escribe de forma clara y estructurada para copiarlo en un documento Word.
 """
 
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=[{"role": "user", "content": prompt_sesion}],
             temperature=0.7,
             max_tokens=1500
         )
 
-        resultado = response['choices'][0]['message']['content']
+        resultado = response.choices[0].message.content
 
         doc = Document()
         doc.add_heading('SESIÓN DE APRENDIZAJE', 0)
@@ -59,33 +58,35 @@ Escribe de forma clara y estructurada para copiarlo en un documento Word.
         buffer.seek(0)
 
         st.success("✅ Sesión generada con éxito.")
-        st.download_button("📅 Descargar sesión Word", data=buffer, file_name="sesion_IA_dinamica.docx")
+        st.download_button("📥 Descargar sesión Word", data=buffer, file_name="sesion_IA_dinamica.docx")
 
 # Botón 2: Generar rúbrica
-if st.button("📊 Generar rúbrica de evaluación"):
-    with st.spinner("Generando rúbrica personalizada..."):
-
-        prompt_rubrica = f"""
+def generar_rubrica():
+    prompt_rubrica = f"""
 Eres un especialista en evaluación educativa del área Ciencia y Tecnología en Perú. Crea una rúbrica de evaluación para estudiantes de {grado} de secundaria, alineada a la competencia "{competencia}", sobre el tema "{titulo}". Usa criterios claros, niveles de logro (AD, A, B, C) y descripciones observables para cada nivel. Formato tabla simple lista para exportar a Word.
 """
 
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[{"role": "user", "content": prompt_rubrica}],
-            temperature=0.7,
-            max_tokens=1000
-        )
+    response = client.chat.completions.create(
+        model="gpt-4",
+        messages=[{"role": "user", "content": prompt_rubrica}],
+        temperature=0.7,
+        max_tokens=1000
+    )
 
-        resultado = response['choices'][0]['message']['content']
+    resultado = response.choices[0].message.content
 
-        doc = Document()
-        doc.add_heading('RÚBRICA DE EVALUACIÓN', 0)
-        for linea in resultado.split("\n"):
-            doc.add_paragraph(linea)
+    doc = Document()
+    doc.add_heading('RÚBRICA DE EVALUACIÓN', 0)
+    for linea in resultado.split("\n"):
+        doc.add_paragraph(linea)
 
-        buffer = BytesIO()
-        doc.save(buffer)
-        buffer.seek(0)
+    buffer = BytesIO()
+    doc.save(buffer)
+    buffer.seek(0)
 
-        st.success("✅ Rúbrica generada con éxito.")
-        st.download_button("📅 Descargar rúbrica Word", data=buffer, file_name="rubrica_IA.docx")
+    st.success("✅ Rúbrica generada con éxito.")
+    st.download_button("📥 Descargar rúbrica Word", data=buffer, file_name="rubrica_IA.docx")
+
+if st.button("📊 Generar rúbrica de evaluación"):
+    with st.spinner("Generando rúbrica personalizada..."):
+        generar_rubrica()

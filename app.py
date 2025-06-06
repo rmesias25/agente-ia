@@ -40,7 +40,7 @@ Escribe de forma clara y estructurada para copiarlo en un documento Word.
 """
 
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt_sesion}],
             temperature=0.7,
             max_tokens=1500
@@ -67,7 +67,7 @@ Eres un especialista en evaluación educativa del área Ciencia y Tecnología en
 """
 
     response = client.chat.completions.create(
-        model="gpt-4",
+        model="gpt-3.5-turbo",
         messages=[{"role": "user", "content": prompt_rubrica}],
         temperature=0.7,
         max_tokens=1000
